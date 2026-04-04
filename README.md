@@ -53,13 +53,6 @@ The project work completed so far includes:
 - MongoDB upload utility added
 - train/test data export flow connected through `main.py`
 
-## Snapshot
-
-<p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=OmKulkarni&show_icons=true&hide_border=true&title_color=0f172a&icon_color=0ea5e9&text_color=334155&bg_color=ffffff" alt="GitHub Stats" />
-</p>
-
-If the stats card does not load on GitHub, the rest of the README still works normally.
 
 ## Project Flow
 
