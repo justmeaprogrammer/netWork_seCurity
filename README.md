@@ -1,3 +1,20 @@
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f172a,40:0ea5e9,100:22c55e&height=220&section=header&text=Network%20Security&fontSize=48&fontColor=ffffff&animation=fadeIn&fontAlignY=40&desc=Phishing%20Data%20Ingestion%20Pipeline&descAlignY=62" alt="Network Security Banner" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/MongoDB-Database-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" />
+  <img src="https://img.shields.io/badge/Scikit--Learn-ML-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white" alt="Scikit Learn" />
+  <img src="https://img.shields.io/badge/Status-Ingestion%20Stage-0EA5E9?style=for-the-badge" alt="Status" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Project%20Focus-Phishing%20Detection%20Pipeline-111827?style=flat-square" alt="Project Focus" />
+  <img src="https://img.shields.io/badge/Current%20Module-Data%20Ingestion-16A34A?style=flat-square" alt="Current Module" />
+  <img src="https://img.shields.io/badge/Logs-Custom%20Tracking-E11D48?style=flat-square" alt="Logs" />
+</p>
+
 # Network Security
 
 A beginner-friendly machine learning project for phishing data ingestion and pipeline setup.
@@ -9,6 +26,19 @@ This repository currently focuses on the first core stage of the project:
 - reading the data back from MongoDB
 - saving a feature-store copy
 - splitting the dataset into train and test files
+
+## Visual Overview
+
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=rect&color=0:111827,50:0ea5e9,100:22c55e&height=120&section=header&text=CSV%20%E2%86%92%20MongoDB%20%E2%86%92%20DataFrame%20%E2%86%92%20Feature%20Store%20%E2%86%92%20Train%20/%20Test&fontSize=26&fontColor=ffffff" alt="Pipeline Flow" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/1-CSV%20Data-2563EB?style=for-the-badge" alt="CSV Data" />
+  <img src="https://img.shields.io/badge/2-MongoDB-059669?style=for-the-badge" alt="MongoDB Step" />
+  <img src="https://img.shields.io/badge/3-Pandas%20DataFrame-7C3AED?style=for-the-badge" alt="DataFrame Step" />
+  <img src="https://img.shields.io/badge/4-Train%20%2F%20Test-EA580C?style=for-the-badge" alt="Train Test Step" />
+</p>
 
 ## Current Progress
 
@@ -22,6 +52,14 @@ The project work completed so far includes:
 - data ingestion component implemented
 - MongoDB upload utility added
 - train/test data export flow connected through `main.py`
+
+## Snapshot
+
+<p align="center">
+  <img src="https://github-readme-stats.vercel.app/api?username=OmKulkarni&show_icons=true&hide_border=true&title_color=0f172a&icon_color=0ea5e9&text_color=334155&bg_color=ffffff" alt="GitHub Stats" />
+</p>
+
+If the stats card does not load on GitHub, the rest of the README still works normally.
 
 ## Project Flow
 
@@ -126,6 +164,10 @@ The project currently uses:
 - PyMongo
 - python-dotenv
 
+<p align="center">
+  <img src="https://skillicons.dev/icons?i=python,mongodb,git,github,vscode" alt="Tech Stack Icons" />
+</p>
+
 ## Setup
 
 ### 1. Create and activate your environment
@@ -166,6 +208,27 @@ After running the pipeline, the project creates:
 - log files
 - timestamp-based artifact folders
 
+## Simple Architecture
+
+```text
+Raw CSV
+  |
+  v
+push_data.py
+  |
+  v
+MongoDB Collection
+  |
+  v
+DataIngestion
+  |
+  +--> feature_store/phisingData.csv
+  |
+  +--> ingested/train.csv
+  |
+  +--> ingested/test.csv
+```
+
 ## What Is Implemented So Far
 
 Completed:
@@ -193,3 +256,7 @@ Next likely steps:
 ## Author
 
 Om Kulkarni
+
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:22c55e,50:0ea5e9,100:0f172a&height=120&section=footer" alt="Footer Banner" />
+</p>
