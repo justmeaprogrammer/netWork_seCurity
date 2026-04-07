@@ -11,7 +11,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Project%20Focus-Phishing%20Detection%20Pipeline-111827?style=flat-square" alt="Project Focus" />
-  <img src="https://img.shields.io/badge/Current%20Module-Data%20Ingestion-16A34A?style=flat-square" alt="Current Module" />
+  <img src="https://img.shields.io/badge/Current%20Module-Data%20Validation-16A34A?style=flat-square" alt="Current Module" />
   <img src="https://img.shields.io/badge/Logs-Custom%20Tracking-E11D48?style=flat-square" alt="Logs" />
 </p>
 
@@ -26,6 +26,8 @@ This repository currently focuses on the first core stage of the project:
 - reading the data back from MongoDB
 - saving a feature-store copy
 - splitting the dataset into train and test files
+- validating the generated train and test files
+- checking basic schema consistency and dataset drift
 
 ## Visual Overview
 
@@ -50,8 +52,12 @@ The project work completed so far includes:
 - pipeline constants defined
 - configuration classes created
 - data ingestion component implemented
+- data validation component implemented
 - MongoDB upload utility added
 - train/test data export flow connected through `main.py`
+- schema-based column count validation added
+- drift report generation added
+- validated train/test output flow connected through `main.py`
 
 
 ## Project Flow
@@ -64,7 +70,9 @@ The current flow of the project is:
 4. Read the collection from MongoDB into a pandas DataFrame
 5. Save the full dataset into the feature store
 6. Split the data into train and test sets
-7. Save the generated files inside the `Artifacts/` directory
+7. Validate the train and test files using the schema
+8. Check train vs test drift using `ks_2samp`
+9. Save validated files and drift report inside the `Artifacts/` directory
 
 ## Project Structure
 
@@ -74,7 +82,8 @@ NetworkSecurity/
 │   └── phisingData.csv
 ├── networksecurity/
 │   ├── components/
-│   │   └── data_ingestion.py
+│   │   ├── data_ingestion.py
+│   │   └── data_validation.py
 │   ├── constant/
 │   │   └── trainig_pipeline/
 │   │       └── __init__.py
@@ -83,8 +92,13 @@ NetworkSecurity/
 │   │   └── config_entity.py
 │   ├── exception/
 │   │   └── exception.py
+│   ├── utils/
+│   │   └── main_utils/
+│   │       └── utils.py
 │   └── logging/
 │       └── logger.py
+├── data_schema/
+│   └── schema.yaml
 ├── main.py
 ├── push_data.py
 ├── requirements.txt
@@ -114,6 +128,16 @@ This file contains the `DataIngestion` class, which:
 - saves the feature-store CSV
 - splits data into train and test files
 
+### `networksecurity/components/data_validation.py`
+
+This file contains the `DataValidation` class, which:
+
+- reads the generated train and test CSV files
+- validates the expected number of columns using `data_schema/schema.yaml`
+- checks dataset drift with the Kolmogorov-Smirnov test
+- writes a drift report file
+- saves validated train and test files
+
 ### `networksecurity/entity/config_entity.py`
 
 This file contains config classes:
@@ -125,7 +149,10 @@ These classes prepare folder paths, file paths, database names, and split settin
 
 ### `networksecurity/entity/artifact_entity.py`
 
-This file contains `DataIngestionArtifact`, which stores the output paths of generated train and test files.
+This file contains:
+
+- `DataIngestionArtifact` for train and test output paths
+- `DataValidationArtifact` for validation outputs and drift report path
 
 ### `networksecurity/constant/trainig_pipeline/__init__.py`
 
@@ -136,6 +163,22 @@ This file stores project constants such as:
 - MongoDB collection name
 - MongoDB database name
 - train-test split ratio
+- schema file path
+- data validation output folder names
+
+### `data_schema/schema.yaml`
+
+This schema file stores:
+
+- expected dataset columns
+- numerical columns used by the pipeline
+
+### `networksecurity/utils/main_utils/utils.py`
+
+This utility file contains helper functions for:
+
+- reading YAML files
+- writing YAML reports
 
 ### `networksecurity/logging/logger.py`
 
@@ -198,6 +241,9 @@ After running the pipeline, the project creates:
 - feature-store CSV file
 - train CSV file
 - test CSV file
+- validated train CSV file
+- validated test CSV file
+- drift report YAML file
 - log files
 - timestamp-based artifact folders
 
@@ -220,6 +266,15 @@ DataIngestion
   +--> ingested/train.csv
   |
   +--> ingested/test.csv
+  |
+  v
+DataValidation
+  |
+  +--> validated/train.csv
+  |
+  +--> validated/test.csv
+  |
+  +--> drift_report/report.yaml
 ```
 
 ## What Is Implemented So Far
@@ -230,11 +285,13 @@ Completed:
 - MongoDB connection flow
 - feature store export
 - train-test split export
+- schema-driven column validation
+- train-test drift detection
+- drift report generation
 - logging and exception system
 
 Next likely steps:
 
-- data validation
 - data transformation
 - model training
 - model evaluation
@@ -243,8 +300,9 @@ Next likely steps:
 ## Notes
 
 - This project is currently in the early pipeline-building stage.
-- The main implemented module right now is data ingestion.
+- The ingestion and data validation modules are now implemented.
 - Some spellings in file and folder names, such as `phisingData.csv` and `trainig_pipeline`, are kept as they exist in the current codebase.
+- `pymongo` must be installed in the active Python environment before running `main.py`.
 
 ## Author
 
