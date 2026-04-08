@@ -1,12 +1,15 @@
 from networksecurity.components.data_ingestion import DataIngestion
 from networksecurity.exception.exception import NetworkSecurityException
 from networksecurity.logging.logger import logging
-from networksecurity.entity.config_entity import DataIngestionConfig
-from networksecurity.entity.config_entity import TrainingPipelineConfig
+from networksecurity.entity.config_entity import TrainingPipelineConfig,\
+                                                 DataIngestionConfig ,\
+                                                 DataValidationConfig,\
+                                                 DataTransformationConfig
 
 from networksecurity.components.data_validation import DataValidation
 from networksecurity.entity.config_entity import DataValidationConfig
 from networksecurity.entity.artifact_entity import DataIngestionArtifact 
+from networksecurity.components.data_transformation import DataTransformation
 
 import sys
 
@@ -24,11 +27,19 @@ if __name__=="__main__":
         dataValidationConfig=DataValidationConfig(trainigpiplelineconfig)
         datavalidationobject=DataValidation(data_ingestion_artifact=dataingestionartifact,
                                             data_validation_config=dataValidationConfig)
-        logging.info("INITIATE DATA INGESTION !")
-        data_validation_artifact=datavalidationobject.initiat_data_validation()
+        logging.info("INITIATE DATA validation !")
+        data_validation_Artifact=datavalidationobject.initiat_data_validation()
         logging.info("data validation completed")
-        print(data_validation_artifact)        
-    
+        print(data_validation_Artifact) 
+        
+        data_Transformation_Config=DataTransformationConfig(training_pipeline_config=trainigpiplelineconfig)
+        data_transformation_object=DataTransformation(data_validation_artifact=data_validation_Artifact,
+                                                      data_transformation_config=data_Transformation_Config)
+        logging.info("INITIATE DATA TRANSFORMATION !")
+        data_transformation_artifact=data_transformation_object.initiate_data_transformation()
+        print(data_transformation_artifact)
+        logging.info("data Transformation completed")
+        
     except Exception as e:
         raise NetworkSecurityException(e,sys)
 
