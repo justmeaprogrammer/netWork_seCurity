@@ -11,7 +11,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Project%20Focus-Phishing%20Detection%20Pipeline-111827?style=flat-square" alt="Project Focus" />
-  <img src="https://img.shields.io/badge/Current%20Module-Data%20Validation-16A34A?style=flat-square" alt="Current Module" />
+  <img src="https://img.shields.io/badge/Current%20Module-Data%20Transformation-16A34A?style=flat-square" alt="Current Module" />
   <img src="https://img.shields.io/badge/Logs-Custom%20Tracking-E11D48?style=flat-square" alt="Logs" />
 </p>
 
@@ -28,6 +28,8 @@ This repository currently focuses on the first core stage of the project:
 - splitting the dataset into train and test files
 - validating the generated train and test files
 - checking basic schema consistency and dataset drift
+- transforming validated train and test data into NumPy arrays
+- saving the fitted preprocessing object for later model stages
 
 ## Visual Overview
 
@@ -53,11 +55,13 @@ The project work completed so far includes:
 - configuration classes created
 - data ingestion component implemented
 - data validation component implemented
+- data transformation component implemented
 - MongoDB upload utility added
 - train/test data export flow connected through `main.py`
 - schema-based column count validation added
 - drift report generation added
 - validated train/test output flow connected through `main.py`
+- transformed train/test NumPy output flow connected through `main.py`
 
 
 ## Project Flow
@@ -73,6 +77,8 @@ The current flow of the project is:
 7. Validate the train and test files using the schema
 8. Check train vs test drift using `ks_2samp`
 9. Save validated files and drift report inside the `Artifacts/` directory
+10. Transform validated train and test data using `KNNImputer`
+11. Save `train.npy`, `test.npy`, and the preprocessing object
 
 ## Project Structure
 
@@ -83,7 +89,8 @@ NetworkSecurity/
 ├── networksecurity/
 │   ├── components/
 │   │   ├── data_ingestion.py
-│   │   └── data_validation.py
+│   │   ├── data_validation.py
+│   │   └── data_transformation.py
 │   ├── constant/
 │   │   └── trainig_pipeline/
 │   │       └── __init__.py
@@ -138,6 +145,17 @@ This file contains the `DataValidation` class, which:
 - writes a drift report file
 - saves validated train and test files
 
+### `networksecurity/components/data_transformation.py`
+
+This file contains the `DataTransformation` class, which:
+
+- reads the validated train and test CSV files
+- separates input features and target column
+- applies `KNNImputer` through a scikit-learn `Pipeline`
+- transforms the train and test feature sets
+- saves transformed arrays as `train.npy` and `test.npy`
+- saves the fitted preprocessing object for reuse
+
 ### `networksecurity/entity/config_entity.py`
 
 This file contains config classes:
@@ -153,6 +171,7 @@ This file contains:
 
 - `DataIngestionArtifact` for train and test output paths
 - `DataValidationArtifact` for validation outputs and drift report path
+- `DataTransformationArtifact` for transformed NumPy files and preprocessing object path
 
 ### `networksecurity/constant/trainig_pipeline/__init__.py`
 
@@ -165,6 +184,7 @@ This file stores project constants such as:
 - train-test split ratio
 - schema file path
 - data validation output folder names
+- data transformation output folder names and file names
 
 ### `data_schema/schema.yaml`
 
@@ -179,6 +199,8 @@ This utility file contains helper functions for:
 
 - reading YAML files
 - writing YAML reports
+- saving NumPy arrays
+- saving serialized Python objects
 
 ### `networksecurity/logging/logger.py`
 
@@ -228,7 +250,7 @@ MONGO_DB_URL="your_mongodb_connection_string"
 python push_data.py
 ```
 
-### 4. Run the ingestion pipeline
+### 4. Run the pipeline
 
 ```bash
 python main.py
@@ -244,6 +266,9 @@ After running the pipeline, the project creates:
 - validated train CSV file
 - validated test CSV file
 - drift report YAML file
+- transformed train NumPy file
+- transformed test NumPy file
+- preprocessing object file
 - log files
 - timestamp-based artifact folders
 
@@ -275,6 +300,15 @@ DataValidation
   +--> validated/test.csv
   |
   +--> drift_report/report.yaml
+  |
+  v
+DataTransformation
+  |
+  +--> transformed/train.npy
+  |
+  +--> transformed/test.npy
+  |
+  +--> transformed/transformed_object/preprocessing.pkl
 ```
 
 ## What Is Implemented So Far
@@ -288,11 +322,14 @@ Completed:
 - schema-driven column validation
 - train-test drift detection
 - drift report generation
+- validated train/test export
+- data transformation with `KNNImputer`
+- transformed NumPy array export
+- preprocessing object export
 - logging and exception system
 
 Next likely steps:
 
-- data transformation
 - model training
 - model evaluation
 - prediction pipeline
@@ -300,7 +337,7 @@ Next likely steps:
 ## Notes
 
 - This project is currently in the early pipeline-building stage.
-- The ingestion and data validation modules are now implemented.
+- The ingestion, validation, and transformation modules are now implemented.
 - Some spellings in file and folder names, such as `phisingData.csv` and `trainig_pipeline`, are kept as they exist in the current codebase.
 - `pymongo` must be installed in the active Python environment before running `main.py`.
 
