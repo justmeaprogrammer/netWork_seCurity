@@ -80,6 +80,8 @@ class DataTransformation:
             proprocessor=self.get_data_transformer_object()
             preprocessor_obj=proprocessor.fit(input_feature_train_df)
             
+            
+            
             transformed_input_train_features=preprocessor_obj.transform(input_feature_train_df)
             transformed_input_test_features=preprocessor_obj.transform(input_feature_test_df)
             
@@ -89,6 +91,9 @@ class DataTransformation:
             save_numpy_array_data(self.data_transformation_config.transformed_train_file_path,train_arr)
             save_numpy_array_data(self.data_transformation_config.transformed_test_file_path,test_arr)
             save_object(self.data_transformation_config.transformed_object_file_path,preprocessor_obj) 
+            
+            save_object("final_models/preprocesor.pkl",preprocessor_obj)
+            
             
             #preparing artifact
             data_transformation_artifact=DataTransformationArtifact(
