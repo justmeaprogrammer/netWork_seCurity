@@ -1,350 +1,245 @@
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f172a,40:0ea5e9,100:22c55e&height=220&section=header&text=Network%20Security&fontSize=48&fontColor=ffffff&animation=fadeIn&fontAlignY=40&desc=Phishing%20Data%20Ingestion%20Pipeline&descAlignY=62" alt="Network Security Banner" />
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f172a,50:0284c7,100:16a34a&height=240&section=header&text=Network%20Security&fontSize=52&fontColor=ffffff&animation=fadeIn&fontAlignY=40&desc=Phishing%20Website%20Detection%20Pipeline&descAlignY=62" alt="Network Security banner" />
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
-  <img src="https://img.shields.io/badge/MongoDB-Database-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" />
-  <img src="https://img.shields.io/badge/Scikit--Learn-ML-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white" alt="Scikit Learn" />
-  <img src="https://img.shields.io/badge/Status-Ingestion%20Stage-0EA5E9?style=for-the-badge" alt="Status" />
+  <img src="https://img.shields.io/badge/Python-Scikit--Learn-1d4ed8?style=for-the-badge&logo=python&logoColor=white" alt="Python and scikit-learn" />
+  <img src="https://img.shields.io/badge/MongoDB-Data%20Source-15803d?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" />
+  <img src="https://img.shields.io/badge/Pipeline-Ingestion%20to%20Training-0f172a?style=for-the-badge" alt="Pipeline" />
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Project%20Focus-Phishing%20Detection%20Pipeline-111827?style=flat-square" alt="Project Focus" />
-  <img src="https://img.shields.io/badge/Current%20Module-Data%20Transformation-16A34A?style=flat-square" alt="Current Module" />
-  <img src="https://img.shields.io/badge/Logs-Custom%20Tracking-E11D48?style=flat-square" alt="Logs" />
+  <img src="https://img.shields.io/badge/Artifacts-Timestamped-f97316?style=flat-square" alt="Artifacts" />
+  <img src="https://img.shields.io/badge/Validation-Schema%20%2B%20Drift-0284c7?style=flat-square" alt="Validation" />
+  <img src="https://img.shields.io/badge/Models-5%20Classifiers-16a34a?style=flat-square" alt="Models" />
 </p>
 
 # Network Security
 
-A beginner-friendly machine learning project for phishing data ingestion and pipeline setup.
+This project builds a phishing website detection pipeline using MongoDB, scikit-learn, and a local artifact-based training workflow.
 
-This repository currently focuses on the first core stage of the project:
+The current codebase supports:
 
-- loading phishing data from a CSV file
-- pushing that data into MongoDB
-- reading the data back from MongoDB
-- saving a feature-store copy
-- splitting the dataset into train and test files
-- validating the generated train and test files
-- checking basic schema consistency and dataset drift
-- transforming validated train and test data into NumPy arrays
-- saving the fitted preprocessing object for later model stages
+- loading phishing records from [`Network_data/phisingData.csv`](/home/om/ML_PROJECTS/NetworkSecurity/Network_data/phisingData.csv)
+- pushing the dataset into MongoDB with [`push_data.py`](/home/om/ML_PROJECTS/NetworkSecurity/push_data.py)
+- exporting data from MongoDB into a feature store
+- splitting the dataset into train and test CSV files
+- validating schema consistency and train/test drift
+- transforming data with `KNNImputer`
+- training multiple classification models and saving the best trained model
 
 ## Visual Overview
 
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=rect&color=0:111827,50:0ea5e9,100:22c55e&height=120&section=header&text=CSV%20%E2%86%92%20MongoDB%20%E2%86%92%20DataFrame%20%E2%86%92%20Feature%20Store%20%E2%86%92%20Train%20/%20Test&fontSize=26&fontColor=ffffff" alt="Pipeline Flow" />
+  <img src="https://quickchart.io/graphviz?format=png&width=1200&graph=digraph%20G%20%7B%20rankdir%3DLR%3B%20node%20%5Bshape%3Dbox%20style%3D%22rounded%2Cfilled%22%20fontname%3DHelvetica%5D%3B%20csv%20%5Blabel%3D%22CSV%20Dataset%0AphisingData.csv%22%20fillcolor%3D%22%23dbeafe%22%20color%3D%22%232563eb%22%5D%3B%20mongo%20%5Blabel%3D%22MongoDB%0AOmKulkarni.NetworkData%22%20fillcolor%3D%22%23dcfce7%22%20color%3D%22%2316a34a%22%5D%3B%20ingest%20%5Blabel%3D%22Data%20Ingestion%0Afeature%20store%20%2B%20split%22%20fillcolor%3D%22%23e0f2fe%22%20color%3D%22%230284c7%22%5D%3B%20valid%20%5Blabel%3D%22Data%20Validation%0Aschema%20%2B%20drift%22%20fillcolor%3D%22%23ffedd5%22%20color%3D%22%23f97316%22%5D%3B%20transform%20%5Blabel%3D%22Data%20Transformation%0AKNNImputer%20%2B%20npy%22%20fillcolor%3D%22%23ede9fe%22%20color%3D%22%237c3aed%22%5D%3B%20train%20%5Blabel%3D%22Model%20Training%0AGridSearchCV%20%2B%20model.pkl%22%20fillcolor%3D%22%23e2e8f0%22%20color%3D%22%23334155%22%5D%3B%20csv%20-%3E%20mongo%20-%3E%20ingest%20-%3E%20valid%20-%3E%20transform%20-%3E%20train%3B%20%7D" alt="Pipeline overview" />
 </p>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/1-CSV%20Data-2563EB?style=for-the-badge" alt="CSV Data" />
-  <img src="https://img.shields.io/badge/2-MongoDB-059669?style=for-the-badge" alt="MongoDB Step" />
-  <img src="https://img.shields.io/badge/3-Pandas%20DataFrame-7C3AED?style=for-the-badge" alt="DataFrame Step" />
-  <img src="https://img.shields.io/badge/4-Train%20%2F%20Test-EA580C?style=for-the-badge" alt="Train Test Step" />
-</p>
+## Pipeline
 
-## Current Progress
+The main workflow in [`main.py`](/home/om/ML_PROJECTS/NetworkSecurity/main.py) runs these stages in sequence:
 
-The project work completed so far includes:
+1. Data ingestion
+2. Data validation
+3. Data transformation
+4. Model training
 
-- project package structure created under `networksecurity/`
-- custom logging setup added
-- custom exception handling added
-- pipeline constants defined
-- configuration classes created
-- data ingestion component implemented
-- data validation component implemented
-- data transformation component implemented
-- MongoDB upload utility added
-- train/test data export flow connected through `main.py`
-- schema-based column count validation added
-- drift report generation added
-- validated train/test output flow connected through `main.py`
-- transformed train/test NumPy output flow connected through `main.py`
-
-
-## Project Flow
-
-The current flow of the project is:
-
-1. Read phishing data from `Network_data/phisingData.csv`
-2. Upload records into MongoDB using `push_data.py`
-3. Start the ingestion pipeline from `main.py`
-4. Read the collection from MongoDB into a pandas DataFrame
-5. Save the full dataset into the feature store
-6. Split the data into train and test sets
-7. Validate the train and test files using the schema
-8. Check train vs test drift using `ks_2samp`
-9. Save validated files and drift report inside the `Artifacts/` directory
-10. Transform validated train and test data using `KNNImputer`
-11. Save `train.npy`, `test.npy`, and the preprocessing object
-
-## Project Structure
+At a high level, the flow is:
 
 ```text
-NetworkSecurity/
-├── Network_data/
-│   └── phisingData.csv
-├── networksecurity/
-│   ├── components/
-│   │   ├── data_ingestion.py
-│   │   ├── data_validation.py
-│   │   └── data_transformation.py
-│   ├── constant/
-│   │   └── trainig_pipeline/
-│   │       └── __init__.py
-│   ├── entity/
-│   │   ├── artifact_entity.py
-│   │   └── config_entity.py
-│   ├── exception/
-│   │   └── exception.py
-│   ├── utils/
-│   │   └── main_utils/
-│   │       └── utils.py
-│   └── logging/
-│       └── logger.py
-├── data_schema/
-│   └── schema.yaml
-├── main.py
-├── push_data.py
-├── requirements.txt
-└── setup.py
-```
-
-## Main Files
-
-### `main.py`
-
-This is the entry point of the project. It creates the config objects, starts the data ingestion process, and prints the ingestion artifact.
-
-### `push_data.py`
-
-This file is used to:
-
-- read the phishing CSV file
-- convert it into JSON-like records
-- insert those records into MongoDB
-
-### `networksecurity/components/data_ingestion.py`
-
-This file contains the `DataIngestion` class, which:
-
-- connects to MongoDB
-- reads collection data into a DataFrame
-- saves the feature-store CSV
-- splits data into train and test files
-
-### `networksecurity/components/data_validation.py`
-
-This file contains the `DataValidation` class, which:
-
-- reads the generated train and test CSV files
-- validates the expected number of columns using `data_schema/schema.yaml`
-- checks dataset drift with the Kolmogorov-Smirnov test
-- writes a drift report file
-- saves validated train and test files
-
-### `networksecurity/components/data_transformation.py`
-
-This file contains the `DataTransformation` class, which:
-
-- reads the validated train and test CSV files
-- separates input features and target column
-- applies `KNNImputer` through a scikit-learn `Pipeline`
-- transforms the train and test feature sets
-- saves transformed arrays as `train.npy` and `test.npy`
-- saves the fitted preprocessing object for reuse
-
-### `networksecurity/entity/config_entity.py`
-
-This file contains config classes:
-
-- `TrainingPipelineConfig`
-- `DataIngestionConfig`
-
-These classes prepare folder paths, file paths, database names, and split settings.
-
-### `networksecurity/entity/artifact_entity.py`
-
-This file contains:
-
-- `DataIngestionArtifact` for train and test output paths
-- `DataValidationArtifact` for validation outputs and drift report path
-- `DataTransformationArtifact` for transformed NumPy files and preprocessing object path
-
-### `networksecurity/constant/trainig_pipeline/__init__.py`
-
-This file stores project constants such as:
-
-- artifact folder names
-- file names
-- MongoDB collection name
-- MongoDB database name
-- train-test split ratio
-- schema file path
-- data validation output folder names
-- data transformation output folder names and file names
-
-### `data_schema/schema.yaml`
-
-This schema file stores:
-
-- expected dataset columns
-- numerical columns used by the pipeline
-
-### `networksecurity/utils/main_utils/utils.py`
-
-This utility file contains helper functions for:
-
-- reading YAML files
-- writing YAML reports
-- saving NumPy arrays
-- saving serialized Python objects
-
-### `networksecurity/logging/logger.py`
-
-This file sets up logging so project activity is written into log files.
-
-### `networksecurity/exception/exception.py`
-
-This file defines a custom exception class to make errors easier to trace.
-
-## Tech Stack
-
-The project currently uses:
-
-- Python
-- Pandas
-- NumPy
-- Scikit-learn
-- MongoDB
-- PyMongo
-- python-dotenv
-
-<p align="center">
-  <img src="https://skillicons.dev/icons?i=python,mongodb,git,github,vscode" alt="Tech Stack Icons" />
-</p>
-
-## Setup
-
-### 1. Create and activate your environment
-
-Install the required packages:
-
-```bash
-pip install -r requirements.txt
-```
-
-### 2. Add environment variables
-
-Create a `.env` file and add:
-
-```env
-MONGO_DB_URL="your_mongodb_connection_string"
-```
-
-### 3. Push data to MongoDB
-
-```bash
-python push_data.py
-```
-
-### 4. Run the pipeline
-
-```bash
-python main.py
-```
-
-## Output
-
-After running the pipeline, the project creates:
-
-- feature-store CSV file
-- train CSV file
-- test CSV file
-- validated train CSV file
-- validated test CSV file
-- drift report YAML file
-- transformed train NumPy file
-- transformed test NumPy file
-- preprocessing object file
-- log files
-- timestamp-based artifact folders
-
-## Simple Architecture
-
-```text
-Raw CSV
+CSV dataset
   |
   v
 push_data.py
   |
   v
-MongoDB Collection
+MongoDB
   |
   v
 DataIngestion
   |
-  +--> feature_store/phisingData.csv
-  |
-  +--> ingested/train.csv
-  |
-  +--> ingested/test.csv
-  |
   v
 DataValidation
-  |
-  +--> validated/train.csv
-  |
-  +--> validated/test.csv
-  |
-  +--> drift_report/report.yaml
   |
   v
 DataTransformation
   |
-  +--> transformed/train.npy
-  |
-  +--> transformed/test.npy
-  |
-  +--> transformed/transformed_object/preprocessing.pkl
+  v
+ModelTrainer
 ```
 
-## What Is Implemented So Far
+## What Each Stage Does
 
-Completed:
+### Data ingestion
 
-- ingestion pipeline skeleton
-- MongoDB connection flow
-- feature store export
-- train-test split export
-- schema-driven column validation
-- train-test drift detection
-- drift report generation
-- validated train/test export
-- data transformation with `KNNImputer`
-- transformed NumPy array export
-- preprocessing object export
-- logging and exception system
+Implemented in [`networksecurity/components/data_ingestion.py`](/home/om/ML_PROJECTS/NetworkSecurity/networksecurity/components/data_ingestion.py).
 
-Next likely steps:
+- connects to MongoDB using `MONGO_DB_URL`
+- reads the `NetworkData` collection from the `OmKulkarni` database
+- drops MongoDB `_id`
+- replaces `"na"` with `NaN`
+- saves a feature-store CSV
+- creates `train.csv` and `test.csv`
 
-- model training
-- model evaluation
-- prediction pipeline
+### Data validation
+
+Implemented in [`networksecurity/components/data_validation.py`](/home/om/ML_PROJECTS/NetworkSecurity/networksecurity/components/data_validation.py).
+
+- checks the expected number of columns using [`data_schema/schema.yaml`](/home/om/ML_PROJECTS/NetworkSecurity/data_schema/schema.yaml)
+- compares train and test distributions with `ks_2samp`
+- writes a drift report YAML file
+- stores validated train and test data when validation succeeds
+
+### Data transformation
+
+Implemented in [`networksecurity/components/data_transformation.py`](/home/om/ML_PROJECTS/NetworkSecurity/networksecurity/components/data_transformation.py).
+
+- separates features from the target column `Result`
+- converts target label `-1` to `0`
+- imputes missing values with `KNNImputer`
+- saves transformed train and test arrays as `.npy`
+- saves the fitted preprocessing object as `preprocessing.pkl`
+
+### Model training
+
+Implemented in [`networksecurity/components/model_trainer.py`](/home/om/ML_PROJECTS/NetworkSecurity/networksecurity/components/model_trainer.py).
+
+- loads transformed NumPy arrays
+- trains and evaluates:
+  - Logistic Regression
+  - Decision Tree
+  - Random Forest
+  - AdaBoost
+  - Gradient Boosting
+- tunes supported models with `GridSearchCV`
+- selects the best model by test accuracy
+- wraps the fitted preprocessor and model inside `NetworkModel`
+- saves the trained model artifact as `model.pkl`
+
+## Project Structure
+
+```text
+NetworkSecurity/
+|-- Network_data/
+|   `-- phisingData.csv
+|-- data_schema/
+|   `-- schema.yaml
+|-- networksecurity/
+|   |-- cloud/
+|   |-- components/
+|   |   |-- data_ingestion.py
+|   |   |-- data_transformation.py
+|   |   |-- data_validation.py
+|   |   `-- model_trainer.py
+|   |-- constant/
+|   |   `-- trainig_pipeline/
+|   |       `-- __init__.py
+|   |-- entity/
+|   |   |-- artifact_entity.py
+|   |   `-- config_entity.py
+|   |-- exception/
+|   |   `-- exception.py
+|   |-- logging/
+|   |   `-- logger.py
+|   `-- utils/
+|       |-- main_utils/
+|       |   `-- utils.py
+|       `-- ml_utils/
+|           |-- metric/
+|           |   `-- classification_metric.py
+|           `-- model/
+|               `-- estimator.py
+|-- main.py
+|-- push_data.py
+|-- requirements.txt
+|-- setup.py
+`-- test_monogdb.py
+```
+
+## Dataset Schema
+
+The schema is defined in [`data_schema/schema.yaml`](/home/om/ML_PROJECTS/NetworkSecurity/data_schema/schema.yaml).
+
+- total columns: 31
+- target column: `Result`
+- all columns are currently treated as numerical inputs in the schema file
+
+## Setup
+
+### 1. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+Optional editable install:
+
+```bash
+pip install -e .
+```
+
+### 2. Create `.env`
+
+Create a `.env` file in the project root:
+
+```env
+MONGO_DB_URL="your_mongodb_connection_string"
+```
+
+### 3. Push the CSV dataset to MongoDB
+
+```bash
+python push_data.py
+```
+
+This loads [`Network_data/phisingData.csv`](/home/om/ML_PROJECTS/NetworkSecurity/Network_data/phisingData.csv) into:
+
+- database: `OmKulkarni`
+- collection: `NetworkData`
+
+### 4. Run the full pipeline
+
+```bash
+python main.py
+```
+
+## Artifacts Produced
+
+The pipeline creates timestamped folders under `Artifacts/`, including outputs such as:
+
+- `data_ingestion/feature_store/phisingData.csv`
+- `data_ingestion/ingested/train.csv`
+- `data_ingestion/ingested/test.csv`
+- `data_validation/validated/train.csv`
+- `data_validation/validated/test.csv`
+- `data_validation/drift_report/report.yaml`
+- `data_transformation/transformed/train.npy`
+- `data_transformation/transformed/test.npy`
+- `data_transformation/transformed/transformed_object/preprocessing.pkl`
+- `model_trainer/trained_model/model.pkl`
+
+Logs are also written under `logs/`.
+
+## Training Snapshot
+
+<p align="center">
+  <img src="https://quickchart.io/graphviz?format=png&width=1200&graph=digraph%20G%20%7B%20rankdir%3DLR%3B%20node%20%5Bshape%3Dbox%20style%3D%22rounded%2Cfilled%22%20fontname%3DHelvetica%5D%3B%20arr%20%5Blabel%3D%22Transformed%20Arrays%0Atrain.npy%20%2B%20test.npy%22%20fillcolor%3D%22%23dbeafe%22%20color%3D%22%232563eb%22%5D%3B%20imputer%20%5Blabel%3D%22Preprocessing%0AKNNImputer%20Pipeline%22%20fillcolor%3D%22%23dcfce7%22%20color%3D%22%2316a34a%22%5D%3B%20models%20%5Blabel%3D%22Candidate%20Models%0ALR%20%7C%20DT%20%7C%20RF%20%7C%20AdaBoost%20%7C%20GB%22%20fillcolor%3D%22%23ffedd5%22%20color%3D%22%23f97316%22%5D%3B%20search%20%5Blabel%3D%22GridSearchCV%0Amodel%20selection%22%20fillcolor%3D%22%23ede9fe%22%20color%3D%22%237c3aed%22%5D%3B%20saved%20%5Blabel%3D%22Saved%20Artifact%0ANetworkModel%20-%3E%20model.pkl%22%20fillcolor%3D%22%23e2e8f0%22%20color%3D%22%23334155%22%5D%3B%20arr%20-%3E%20imputer%20-%3E%20models%20-%3E%20search%20-%3E%20saved%3B%20%7D" alt="Model training stack" />
+</p>
+
+## Important Files
+
+- [`main.py`](/home/om/ML_PROJECTS/NetworkSecurity/main.py): runs the full training pipeline
+- [`push_data.py`](/home/om/ML_PROJECTS/NetworkSecurity/push_data.py): uploads CSV records to MongoDB
+- [`networksecurity/entity/config_entity.py`](/home/om/ML_PROJECTS/NetworkSecurity/networksecurity/entity/config_entity.py): builds artifact paths and stage configs
+- [`networksecurity/entity/artifact_entity.py`](/home/om/ML_PROJECTS/NetworkSecurity/networksecurity/entity/artifact_entity.py): defines stage artifact dataclasses
+- [`networksecurity/utils/main_utils/utils.py`](/home/om/ML_PROJECTS/NetworkSecurity/networksecurity/utils/main_utils/utils.py): YAML, pickle, NumPy, and model-evaluation helpers
 
 ## Notes
 
-- This project is currently in the early pipeline-building stage.
-- The ingestion, validation, and transformation modules are now implemented.
-- Some spellings in file and folder names, such as `phisingData.csv` and `trainig_pipeline`, are kept as they exist in the current codebase.
-- `pymongo` must be installed in the active Python environment before running `main.py`.
+- The codebase uses existing names such as `phisingData.csv`, `trainig_pipeline`, and `test_monogdb.py`; those spellings are preserved because the code depends on them.
+- [`Dockerfile`](/home/om/ML_PROJECTS/NetworkSecurity/Dockerfile) is currently empty.
+- The logging setup in [`networksecurity/logging/logger.py`](/home/om/ML_PROJECTS/NetworkSecurity/networksecurity/logging/logger.py) creates a timestamped log path under `logs/`.
+- The repo includes a MongoDB connection sample in [`test_monogdb.py`](/home/om/ML_PROJECTS/NetworkSecurity/test_monogdb.py).
 
 ## Author
 
 Om Kulkarni
-
-<p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:22c55e,50:0ea5e9,100:0f172a&height=120&section=footer" alt="Footer Banner" />
-</p>
