@@ -5,5 +5,11 @@ venv
 #Python Cache
 __pycache__/
 
-#logs
+#logs and artifacts
 logs/
+Artifacts/
+
+#mlflow
+mlruns/
+mlflow.db
+
