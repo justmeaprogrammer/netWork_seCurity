@@ -27,6 +27,8 @@ The current codebase supports:
 - validating schema consistency and train/test drift
 - transforming data with `KNNImputer`
 - training multiple classification models and saving the best trained model
+- serving the trained model through FastAPI in [`app.py`](/home/om/ML_PROJECTS/NetworkSecurity/app.py)
+- running batch prediction by uploading the validated file [`valid_data/test.csv`](/home/om/ML_PROJECTS/NetworkSecurity/valid_data/test.csv)
 
 ## Visual Overview
 
@@ -115,14 +117,30 @@ Implemented in [`networksecurity/components/model_trainer.py`](/home/om/ML_PROJE
 - wraps the fitted preprocessor and model inside `NetworkModel`
 - saves the trained model artifact as `model.pkl`
 
+### Batch prediction
+
+Implemented in [`app.py`](/home/om/ML_PROJECTS/NetworkSecurity/app.py).
+
+- exposes `POST /predict` for CSV upload
+- loads the saved model from [`final_models/model.pkl`](/home/om/ML_PROJECTS/NetworkSecurity/final_models/model.pkl)
+- loads the saved preprocessor from [`final_models/preprocesor.pkl`](/home/om/ML_PROJECTS/NetworkSecurity/final_models/preprocesor.pkl)
+- uses the validated feature-only batch file [`valid_data/test.csv`](/home/om/ML_PROJECTS/NetworkSecurity/valid_data/test.csv)
+- appends a `predicted_column` to the uploaded data
+- saves the prediction result to [`prediction_output/prediction.csv`](/home/om/ML_PROJECTS/NetworkSecurity/prediction_output/prediction.csv)
+- renders the predicted rows in the browser through [`templates/table.html`](/home/om/ML_PROJECTS/NetworkSecurity/templates/table.html)
+
 ## Project Structure
 
 ```text
 NetworkSecurity/
+|-- app.py
 |-- Network_data/
 |   `-- phisingData.csv
 |-- data_schema/
 |   `-- schema.yaml
+|-- final_models/
+|   |-- model.pkl
+|   `-- preprocesor.pkl
 |-- networksecurity/
 |   |-- cloud/
 |   |-- components/
@@ -148,6 +166,12 @@ NetworkSecurity/
 |           |   `-- classification_metric.py
 |           `-- model/
 |               `-- estimator.py
+|-- prediction_output/
+|   `-- prediction.csv
+|-- templates/
+|   `-- table.html
+|-- valid_data/
+|   `-- test.csv
 |-- main.py
 |-- push_data.py
 |-- requirements.txt
@@ -162,6 +186,7 @@ The schema is defined in [`data_schema/schema.yaml`](/home/om/ML_PROJECTS/Networ
 - total columns: 31
 - target column: `Result`
 - all columns are currently treated as numerical inputs in the schema file
+- batch prediction uses the validated 30 feature columns from [`valid_data/test.csv`](/home/om/ML_PROJECTS/NetworkSecurity/valid_data/test.csv)
 
 ## Setup
 
@@ -202,6 +227,22 @@ This loads [`Network_data/phisingData.csv`](/home/om/ML_PROJECTS/NetworkSecurity
 python main.py
 ```
 
+### 5. Start the FastAPI app
+
+```bash
+uvicorn app:app --reload
+```
+
+Open `http://127.0.0.1:8000/docs` to access the Swagger UI.
+
+### 6. Run batch prediction
+
+Use the `POST /predict` endpoint and upload:
+
+- [`valid_data/test.csv`](/home/om/ML_PROJECTS/NetworkSecurity/valid_data/test.csv)
+
+This validated CSV is the ready-to-use batch input file for prediction.
+
 ## Artifacts Produced
 
 The pipeline creates timestamped folders under `Artifacts/`, including outputs such as:
@@ -216,8 +257,19 @@ The pipeline creates timestamped folders under `Artifacts/`, including outputs s
 - `data_transformation/transformed/test.npy`
 - `data_transformation/transformed/transformed_object/preprocessing.pkl`
 - `model_trainer/trained_model/model.pkl`
+- `prediction_output/prediction.csv`
 
 Logs are also written under `logs/`.
+
+## API Endpoints
+
+The FastAPI app in [`app.py`](/home/om/ML_PROJECTS/NetworkSecurity/app.py) exposes:
+
+- `GET /`: redirects to Swagger docs
+- `GET /train`: runs the full training pipeline
+- `POST /predict`: accepts a batch CSV upload and returns the predicted table
+
+For batch prediction, the recommended upload file is [`valid_data/test.csv`](/home/om/ML_PROJECTS/NetworkSecurity/valid_data/test.csv).
 
 ## Training Snapshot
 
@@ -227,8 +279,11 @@ Logs are also written under `logs/`.
 
 ## Important Files
 
+- [`app.py`](/home/om/ML_PROJECTS/NetworkSecurity/app.py): FastAPI app for training and batch prediction
 - [`main.py`](/home/om/ML_PROJECTS/NetworkSecurity/main.py): runs the full training pipeline
 - [`push_data.py`](/home/om/ML_PROJECTS/NetworkSecurity/push_data.py): uploads CSV records to MongoDB
+- [`valid_data/test.csv`](/home/om/ML_PROJECTS/NetworkSecurity/valid_data/test.csv): validated batch input file used for prediction uploads
+- [`prediction_output/prediction.csv`](/home/om/ML_PROJECTS/NetworkSecurity/prediction_output/prediction.csv): saved batch prediction output
 - [`networksecurity/entity/config_entity.py`](/home/om/ML_PROJECTS/NetworkSecurity/networksecurity/entity/config_entity.py): builds artifact paths and stage configs
 - [`networksecurity/entity/artifact_entity.py`](/home/om/ML_PROJECTS/NetworkSecurity/networksecurity/entity/artifact_entity.py): defines stage artifact dataclasses
 - [`networksecurity/utils/main_utils/utils.py`](/home/om/ML_PROJECTS/NetworkSecurity/networksecurity/utils/main_utils/utils.py): YAML, pickle, NumPy, and model-evaluation helpers
